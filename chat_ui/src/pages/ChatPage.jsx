@@ -60,7 +60,7 @@ const ChatPage = () => {
         setSelectedChat(existingChat);
       } else {
         const res = await axios.post(
-          "http://localhost:5000/api/chat/private",
+          `${apiUrl}/api/chat/private`,
           { userId: user._id },
           { headers }
         );
