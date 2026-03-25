@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl =
+  window.__ENV__?.VITE_API_URL || import.meta.env.VITE_API_URL;
 
 const ChatPage = () => {
   const [chats, setChats] = useState([]);
