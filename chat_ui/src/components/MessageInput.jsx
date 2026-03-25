@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { socket } from '../utils/socket';
 import axios from 'axios';
 import { FaUserCircle } from 'react-icons/fa';
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl =
+  window.__ENV__?.VITE_API_URL || import.meta.env.VITE_API_URL;
 
 const MAX_FILES = 5;
 
