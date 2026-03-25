@@ -1,7 +1,8 @@
 import React from 'react';
 import './MessageItem.css';
 import { BsReply, BsFileEarmarkPdfFill } from 'react-icons/bs';
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl =
+  window.__ENV__?.VITE_API_URL || import.meta.env.VITE_API_URL;
 
 const MessageItem = ({ msg, currentUser, onReply, onReplyClick, onMentionClick }) => {
   const isMe = msg.sender._id === currentUser._id;
