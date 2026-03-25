@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-const apiUrl = import.meta.env.VITE_API_URL;
-
+const apiUrl = window.__ENV__?.VITE_API_URL || import.meta.env.VITE_API_URL;
 const RegisterPage = () => {
   
   const [form, setForm] = useState({
