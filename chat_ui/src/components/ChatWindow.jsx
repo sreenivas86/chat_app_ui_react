@@ -3,7 +3,8 @@ import axios from 'axios';
 import { socket } from '../utils/socket';
 import MessageItem from './MessageItem';
 import MessageInput from './MessageInput';
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl =
+  window.__ENV__?.VITE_API_URL || import.meta.env.VITE_API_URL;
 
 const ChatWindow = ({ chat, currentUser,allUsers, onUserMention }) => {
   const [messages, setMessages] = useState([]);
