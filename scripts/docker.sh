@@ -1,6 +1,6 @@
-#! /bin/bash
+#!/bin/bash
 
-# This script automate build docker image and push into docker hub
+# This script automates build docker image and push into docker hub
 
 # check docker is exist
 if ! command -v docker >/dev/null 2>&1
@@ -8,19 +8,17 @@ then
     echo "Docker is not installed"
     exit 1;
 fi
-# check Docker deamon is running 
+
+# check Docker daemon is running 
 if ! systemctl is-active docker --quiet
 then
-    echo "Docker installed and Deamon is not running"
+    echo "Docker installed but Daemon is not running"
     exit 1;
 fi
 
 echo "Docker is running"
 
 # read the arguments
-
-#!/bin/bash
-
 while [ "$#" -gt 0 ]
 do
     case "$1" in 
@@ -45,25 +43,26 @@ do
             shift 2
             ;;
         --dockerfile)
-            [ -z "$2" ] && echo "--tag needs value" && exit 1
+            [ -z "$2" ] && echo "--dockerfile needs value" && exit 1
             DFILE="$2"
             shift 2
             ;;
         --context)
-            [ -z "$2" ] && echo "--tag needs value" && exit 1
+            [ -z "$2" ] && echo "--context needs value" && exit 1
             CONTEXT="$2"
             shift 2
             ;;
         *)
-            echo " Invalid flag $1"
+            echo "Invalid flag $1"
             exit 1
             ;;
     esac 
 done
 
-# Required check
-if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$IMAGE" ] || [ -z "$DFile" ] || [ -z "$CONTEXT" ]; then
-    echo " Missing required arguments"
+# Required check - FIXED variable name
+if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$IMAGE" ] || [ -z "$DFILE" ] || [ -z "$CONTEXT" ]; then
+    echo "Missing required arguments"
+    echo "Required: --username, --password, --image, --dockerfile, --context"
     exit 1
 fi
 
@@ -71,44 +70,54 @@ fi
 TAG=${TAG:-latest}
 
 echo "Username: $USERNAME"
-echo "Image: $IMAGE:$TAG"f
+echo "Image: $IMAGE:$TAG"  # Removed the 'f' at the end
+
 # add a variable for Imagename
 IMAGE_NAME="$USERNAME/$IMAGE:$TAG"
 
 # Build docker image from Dockerfile
+echo "Building Docker image..."
 docker build \
--t "$IMAGE_NAME" \
--f "$DFILE" \
-"$CONTEXT" \
-&& echo "$IMAGE_NAME has been created "
+    -t "$IMAGE_NAME" \
+    -f "$DFILE" \
+    "$CONTEXT"
+    
+if [ $? -eq 0 ]; then
+    echo "$IMAGE_NAME has been created successfully"
+else
+    echo "Docker build failed"
+    exit 1
+fi
 
 # remove existing dockerhub login
 CONFIG="$HOME/.docker/config.json"
 if [ -f "$CONFIG" ]; then
     if grep -q '"auths"' "$CONFIG"; then
-        docker logout && removed existing credentials successfully
+        docker logout && echo "Removed existing credentials successfully"
     fi
 fi
 
-
 # connect to docker hub
+echo "Logging into Docker Hub..."
+docker login -u "$USERNAME" --password-stdin <<< "$PASSWORD"
 
-docker login \
--u "$USERNAME" \
---password-stdin <<< "$PASSWORD" \
-&& echo " Docker hub connected successfully"
+if [ $? -eq 0 ]; then
+    echo "Docker hub connected successfully"
+else
+    echo "Docker login failed"
+    exit 1
+fi
 
-#push your image to docker hub
+# push your image to docker hub
+echo "Pushing image to Docker Hub..."
+docker push "$IMAGE_NAME"
 
-docker push "$IMAGE_NAME" \
-&& echo "$IMAGE_NAME is successfully uploaded! "
-
+if [ $? -eq 0 ]; then
+    echo "$IMAGE_NAME is successfully uploaded!"
+else
+    echo "Docker push failed"
+    exit 1
+fi
 
 # Disconnect Docker-hub
-docker logout &&  echo " docker hub disconnected successfully"
-
-
-
-
-
-
+docker logout && echo "Docker hub disconnected successfully"
