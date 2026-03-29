@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-app-pvc
+  namespace: chat-app-ns 
+
+spec:
+  accessModes:
+    - ReadWriteMany
+
+  storageClassName: chat-app-sc
+
+  volumeMode: Filesystem
+
+  resources:
+    requests:
+      storage: 5Gi
