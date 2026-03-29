@@ -104,3 +104,11 @@ docker push "$IMAGE_NAME" \
 && echo "$IMAGE_NAME is successfully uploaded! "
 
 
+# Disconnect Docker-hub
+docker logout &&  echo " docker hub disconnected successfully"
+
+
+
+
+
+
