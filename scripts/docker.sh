@@ -75,19 +75,7 @@ echo "Image: $IMAGE:$TAG"  # Removed the 'f' at the end
 # add a variable for Imagename
 IMAGE_NAME="$USERNAME/$IMAGE:$TAG"
 
-# Build docker image from Dockerfile
-echo "Building Docker image..."
-docker build \
-    -t "$IMAGE_NAME" \
-    -f "$DFILE" \
-    "$CONTEXT"
-    
-if [ $? -eq 0 ]; then
-    echo "$IMAGE_NAME has been created successfully"
-else
-    echo "Docker build failed"
-    exit 1
-fi
+
 
 # remove existing dockerhub login
 CONFIG="$HOME/.docker/config.json"
@@ -105,6 +93,21 @@ if [ $? -eq 0 ]; then
     echo "Docker hub connected successfully"
 else
     echo "Docker login failed"
+    exit 1
+fi
+
+
+# Build docker image from Dockerfile
+echo "Building Docker image..."
+docker build \
+    -t "$IMAGE_NAME" \
+    -f "$DFILE" \
+    "$CONTEXT"
+    
+if [ $? -eq 0 ]; then
+    echo "$IMAGE_NAME has been created successfully"
+else
+    echo "Docker build failed"
     exit 1
 fi
 
