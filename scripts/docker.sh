@@ -124,3 +124,15 @@ fi
 
 # Disconnect Docker-hub
 docker logout && echo "Docker hub disconnected successfully"
+
+
+
+# command to run this script
+# bash scripts/docker.sh \
+#  --username sree471 \
+#  --password "dckr_pat_MXQ1hLO776_kVLs9n3SNu-kB7uU" \
+#  --image chatty \
+#  --tag not \
+#  --dockerfile "$(pwd)/backend/Dockerfile" \
+#  --context "$(pwd)/backend"
+  
