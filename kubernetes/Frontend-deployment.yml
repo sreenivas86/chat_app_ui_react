@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-app-frontend-deploy
+  namespace: chat-app-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chat-app-frontend
+  template:
+    metadata:
+      labels:
+        app: chat-app-frontend
+    spec:
+      containers:
+      - name: chat-app-frontend
+        image: sree471/chatui:1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: VITE_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: chat-app-cm
+              key: BACKEND_URI
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5

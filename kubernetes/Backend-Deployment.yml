@@ -25,9 +25,8 @@ spec:
           imagePullPolicy: Always
 
           ports: 
-            - containerPort: 5000   
+            - containerPort: 5000    
 
-          
           env:
             - name: PORT
               valueFrom:
@@ -50,6 +49,26 @@ spec:
           volumeMounts:
             - name: chat-app-volume
               mountPath: "/app/uploads/chat"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
       volumes:
         - name: chat-app-volume
