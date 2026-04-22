@@ -1,4 +1,4 @@
-# this pipeline build docker image and push to docker hub and deploy images on azure vm
+# this pipeline build docker image and push to docker hub and deploy images on azure vm 
 
 
 name: docker vm deployment
