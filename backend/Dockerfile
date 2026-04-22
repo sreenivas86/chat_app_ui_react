@@ -6,8 +6,6 @@ WORKDIR /app
 # create uploads/chat inside /app directory for binary data 
 RUN mkdir -p uploads/chat
 
-# update npm to latest version
-RUN npm install -g npm@11.12.1
 
 # Copy package files first (for caching)
 COPY package*.json ./
@@ -15,11 +13,6 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install 
 
-# audit the issues
-RUN npm audit fix --force
-
-# re install all things
-RUN npm i
 
 # Copy remaining app files
 COPY . .
