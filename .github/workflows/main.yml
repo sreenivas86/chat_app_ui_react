@@ -55,7 +55,7 @@ jobs:
           chmod +x private.pem
       - name: Connect vm
         run: |
-          ssh -i private.pem -o StrictHostKeyChecking=no ${{ vars.VM_HOST }}@${{ vars.VM_USER }} "
+          ssh -i private.pem -o StrictHostKeyChecking=no ${{ vars.VM_USER }}@${{ vars.VM_HOST }} "
             echo " connected to ${{vars.VM_HOST}}"
             # stop existing backend  container
             docker stop chat-app-backend || true
