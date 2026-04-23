@@ -43,6 +43,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ github.run_number}}
 
   deploy:
+    needs: build
     name: deploy on docker vm
     runs-on: ubuntu-latest
     env:
@@ -52,7 +53,7 @@ jobs:
       - name: create private key
         run: |
           echo "${{secrets.VM_PRIVATE_KEY}}" > private.pem
-          chmod +x private.pem
+          chmod 600 private.pem
       - name: Connect vm
         run: |
           ssh -i private.pem -o StrictHostKeyChecking=no ${{ vars.VM_USER }}@${{ vars.VM_HOST }} "
