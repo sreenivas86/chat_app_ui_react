@@ -1,0 +1,11 @@
+name: AKS deployment
+on: 
+  push:
+    branches:
+      - abc
+jobs:
+  aksdep:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: connect aks
