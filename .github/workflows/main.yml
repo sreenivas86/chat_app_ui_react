@@ -41,5 +41,55 @@ jobs:
 
       - name: push to docker hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ github.run_number}}
+
+  deploy:
+    name: deploy on docker vm
+    runs-on: ubuntu-latest
+    env:
+      MONGO_URL: mongodb://${{ vars.MONGO_USER }}:${{ secrets.MONGO_PASSWORD }}@${{ vars.MONGO_HOST }}:${{ vars.MONGO_PORT }}/${{ vars.MONGO_DB_NAME }}?authSource=admin
+      
+    steps:
+      - name: create private key
+        run: |
+          echo "${{secrets.VM_PRIVATE_KEY}}" > private.pem
+          chmod +x private.pem
+      - name: Connect vm
+        run: |
+          ssh -i private.pem -o StrictHostKeyChecking=no ${{ vars.VM_HOST }}@${{ vars.VM_USER }} "
+            echo " connected to ${{vars.VM_HOST}}"
+            # stop existing backend  container
+            docker stop chat-app-backend || true
+
+            #pull backend image and deploy it
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.BACKEND_IMAGE_NAME }}:${{ github.run_number}}
+
+            docker run -d \
+            --restart always\
+            -p 5000:5000 \
+            -e JWT_SECRET= ${{ secrets.JWT_SECRETE}} \
+            -e MONGO_URI= $MONGO_URL \
+            -e PORT=5000 \
+            --name chat-app-backend \
+            ${{ secrets.DOCKER_USERNAME }}/${{ vars.BACKEND_IMAGE_NAME }}:${{ github.run_number}}
+
+
+            #stop existing frontend container
+            docker stop chat-app-frontend
+
+            #pull frontend image and deploy it
+
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ github.run_number}}
+            
+            docker run -d \
+            -p 80:80 \
+            -e VITE_API_URL=http://${{vars.VM_HOST}}:5000 \
+            --name chat-app-frontend \
+            ${{ secrets.DOCKER_USERNAME }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ github.run_number}}
+
+            docker image prune -af
+
+            "
+            
+          
           
     
