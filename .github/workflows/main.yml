@@ -60,6 +60,7 @@ jobs:
             echo " connected to ${{vars.VM_HOST}}"
             # stop existing backend  container
             docker stop chat-app-backend || true
+            docker rm chat-app-backend || true
 
             #pull backend image and deploy it
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.BACKEND_IMAGE_NAME }}:${{ github.run_number}}
@@ -75,7 +76,8 @@ jobs:
 
 
             #stop existing frontend container
-            docker stop chat-app-frontend
+            docker stop chat-app-frontend || true
+            docker rm chat-app-frontend || true
 
             #pull frontend image and deploy it
 
