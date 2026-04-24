@@ -4,7 +4,7 @@ metadata:
   name: mongodb-premium-sc
   namespace: chat-app-ns
 provisioner: disk.csi.azure.com
-reclaimPolicy: retain 
+reclaimPolicy: Retain 
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 parameters:
