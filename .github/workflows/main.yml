@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'kubernetes/**'
+      - '.github/**'
 jobs:
   build:
     name: Build docker image
