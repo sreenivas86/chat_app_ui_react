@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: chat-app-backend
-          image: sree471/chatb:1
+          image: sree471/chat-app-backend:18
           imagePullPolicy: Always
 
           ports: 
