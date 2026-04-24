@@ -63,3 +63,7 @@ yq -i "
 " "$FILE_PATH"
 
 echo " Update successfully....."
+
+
+#command to find ip
+#BACKEND_IP=$(kubectl get svc chat-app-backend-svc -n chat-app-ns -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
