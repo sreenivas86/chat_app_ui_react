@@ -76,7 +76,7 @@ jobs:
         run: |
           git add .
           git commit -m "update k8 files in $BRANCH_NAME"
-          git push $GIT_URL $BRANCH_NAME
+          git push origin $GIT_URL $BRANCH_NAME
           echo "successfully executed ...."
       - name: merge into main brach
         run: |
@@ -84,7 +84,7 @@ jobs:
           git merge $BRANCH_NAME
           git add .
           git commit -m " merge branch $BRANCH_NAME into main"
-          git puhs $GIT_URL main
+          git push origin $GIT_URL main
         
   k8s:
     name: connect to aks and run aks files
