@@ -90,58 +90,62 @@ jobs:
       #     git push  $GIT_URL main
         
   k8s:
-    name: connect to aks and run aks files
+    name: connect to aks and run k8s files
     runs-on: ubuntu-latest
     needs:
       - backend
       - frontend
+
     steps:
       - name: checkout code
-        uses: actions/checkout@v6
-      
+        uses: actions/checkout@v4
+
       - name: update image names
         run: |
           chmod +x ./scripts/yq-editor.sh
-          sh ./scripts/yq-editor.sh --file ./kubernetes/backend/Backend-Deployment.yml --image $DOCKER_BACKEND_IMAGE 
-          sh  ./scripts/yq-editor.sh --file ./kubernetes/frontend/Frontend-deployment.yml --image $DOCKER_FRONTEND_IMAGE
+          sh ./scripts/yq-editor.sh --file ./kubernetes/backend/Backend-Deployment.yml --image $DOCKER_BACKEND_IMAGE
+          sh ./scripts/yq-editor.sh --file ./kubernetes/frontend/Frontend-deployment.yml --image $DOCKER_FRONTEND_IMAGE
 
-
+      # ✅ FIXED LOGIN
       - name: connect to azure
-        uses: Azure/login@v3
+        uses: azure/login@v3
         with:
-          client-id: ${{secrets.AZURE_CLIENT_ID}}
-          tenant-id: ${{secrets.AZURE_TENANT_ID}}
-          subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: set AKS context
         uses: azure/aks-set-context@v5
         with:
-          resource-group: ${{vars.AKS_RESOURCE_GROUP}}
-          cluster-name: ${{vars.AKS_CLUSTER_NAME}}
+          resource-group: ${{ vars.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ vars.AKS_CLUSTER_NAME }}
+
       - name: install kubectl
         uses: azure/setup-kubectl@v4
 
-      - name: deploy main k8s
+      - name: deploy base k8s
         run: |
           kubectl apply -f ./kubernetes/Namespace.yml
           kubectl apply -f ./kubernetes/mongodb
           kubectl apply -f ./kubernetes/backend/Backend-Service.yml
-      
-      - name: change config file
+
+      - name: wait for backend IP
         run: |
-          BACKEND_IP=$(kubectl get svc chat-app-backend-svc -n chat-app-ns -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
+          for i in {1..20}; do
+            BACKEND_IP=$(kubectl get svc chat-app-backend-svc -n chat-app-ns -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            if [ -n "$BACKEND_IP" ]; then
+              echo "BACKEND_IP=$BACKEND_IP" >> $GITHUB_ENV
+              break
+            fi
+            echo "Waiting for LoadBalancer IP..."
+            sleep 10
+          done
+
+      - name: update config
+        run: |
           chmod +x ./scripts/config-map-uri-change.sh
-          sh ./scripts/config-map-uri-change.sh --file ./kubernetes/configs/ConfigMaps.yml "http://$BACKEND_IP:5000"
-      
-      - name: deploy k8s files
+          sh ./scripts/config-map-uri-change.sh --file ./kubernetes/configs/ConfigMaps.yml "http://${BACKEND_IP}:5000"
+
+      - name: deploy full k8s
         run: |
           kubectl apply -f ./kubernetes/configs
           kubectl apply -f ./kubernetes/backend
-          kubectl create -f ./kubernetes/frontend
-      
-      # - name: k8s deploy
-      #   uses: azure/k8s-deploy@v4.9
-      #   with
-
-
-      
+          kubectl apply -f ./kubernetes/frontend
