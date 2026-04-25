@@ -57,6 +57,10 @@ jobs:
     steps:
       - name: checkout git
         uses: actions/checkout@v6
+      - name: set credentials
+        run: |
+           git config --global user.email "sreenivas@gmail.com"
+           git config --global user.name "sreenivas"
     
       - name: create and swith branch
         run: |
