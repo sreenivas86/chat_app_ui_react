@@ -7,6 +7,9 @@ on:
       - 'kubernetes/**'
       # - '.github/**'
 
+permissions:
+  id-token: write
+  contents: read
 env:
   DOCKER_BACKEND_IMAGE: ${{secrets.DOCKER_USERNAME}}/${{vars.BACKEND_IMAGE_NAME}}:Ak_${{github.run_number}}
   DOCKER_FRONTEND_IMAGE: ${{secrets.DOCKER_USERNAME}}/${{vars.FRONTEND_IMAGE_NAME}}:Ak_${{github.run_number}}
