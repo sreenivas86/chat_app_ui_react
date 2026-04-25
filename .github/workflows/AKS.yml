@@ -141,8 +141,8 @@ jobs:
 
       - name: update config
         run: |
-          chmod +x ./scripts/config-map-uri-change.sh
-          sh ./scripts/config-map-uri-change.sh --file ./kubernetes/configs/ConfigMaps.yml "http://${BACKEND_IP}:5000"
+          chmod +x ./scripts/config-map-uri-chage.sh
+          sh ./scripts/config-map-uri-chage.sh --file ./kubernetes/configs/ConfigMaps.yml "http://${BACKEND_IP}:5000"
 
       - name: deploy full k8s
         run: |
