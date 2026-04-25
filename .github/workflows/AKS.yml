@@ -5,7 +5,7 @@ on:
       - main
     paths-ignore:
       - 'kubernetes/**'
-      - '.github/**'
+      # - '.github/**'
 
 env:
   DOCKER_BACKEND_IMAGE: ${{secrets.DOCKER_USERNAME}}/${{vars.BACKEND_IMAGE_NAME}}:Ak_${{github.run_number}}
@@ -115,6 +115,12 @@ jobs:
           BACKEND_IP=$(kubectl get svc chat-app-backend-svc -n chat-app-ns -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
           chmod +x ./scripts/config-map-uri-change.sh
           sh ./scripts/config-map-uri-change.sh --file ./kubernetes/configs/ConfigMaps.yml "http://$BACKEND_IP:5000"
+      
+      - name: deploy k8s files
+        run: |
+          kubectl apply -f ./kubernetes/configs
+          kubectl apply -f ./kubernetes/backend
+          kubectl create -f ./kubernetes/frontend
       
       # - name: k8s deploy
       #   uses: azure/k8s-deploy@v4.9
