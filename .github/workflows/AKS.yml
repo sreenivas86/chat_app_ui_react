@@ -100,6 +100,10 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+      - name: print variables
+        run: |
+          echo $DOCKER_BACKEND_IMAGE
+          echo $DOCKER_FRONTEND_IMAGE
 
       - name: update image names
         run: |
