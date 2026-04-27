@@ -57,9 +57,9 @@ fi
 # -----------------------------
 echo "Updating image to $IMAGE in $FILE_PATH..."
 
-yq -i '
-  select(.kind == "Deployment")
-  .spec.template.spec.containers[].image = $IMAGE
-' "$FILE_PATH"
+yq -i "
+  select(.kind == \"Deployment\")
+  .spec.template.spec.containers[].image = \"$IMAGE\"
+" "$FILE_PATH"
 
 echo " Update successfully....."
