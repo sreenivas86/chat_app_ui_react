@@ -1,32 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment 
 metadata:
-  name: chat-app-backed-deploy
-  namespace: chat-app-ns
+  name: chat-app-backed-deploy # name of deployment
+  namespace: chat-app-ns # provide name space 
   labels:
-    app: chat-app-backend
+    app: chat-app-backend # label to attach service 
 
 spec:
+  # this init container is checking is mongodb is running or not.
+  # if mongodb is not started, this container blocks to creation of backend app
+  initContainers:
+    - name: mongo db busu box
+      image: busybox:stable-uclibc
+      command:
+        - sh
+        - -c
+        - |
+          echo " wating for mongodb"
+          until nc -z mongodb 27017; do
+            echo "mongo db is not ready"
+            sleep 2
+          done
+          echo "mongo db is ready"
+  
+  # mention how many replicas create 
   replicas: 2
-
+  # selector helps to find pod and service by using labels
   selector:
     matchLabels:
       app: chat-app-backend
-
+  # Template is used to define pod configuration
   template:  
     metadata:
       labels: 
-        app: chat-app-backend
-
+        app: chat-app-backend # this label matches to under selector matchLabel
+    # here we define container confs
     spec:
       containers:
-        - name: chat-app-backend
-          image: sree471/chat-app-backend:18
-          imagePullPolicy: Always
+        - name: chat-app-backend # give a name of containers
+          image: sree471/chat-app-backend:18 
+          imagePullPolicy: Always # other types Never,IfNotPresent
 
           ports: 
             - containerPort: 5000    
 
+          # add env variables
           env:
             - name: PORT
               valueFrom:
@@ -45,7 +63,7 @@ spec:
                 secretKeyRef:
                   name: chat-app-secret
                   key: JWT_SECRET
-
+          #mount a volume nfs
           volumeMounts:
             - name: chat-app-volume
               mountPath: "/app/uploads/chat"
@@ -58,6 +76,7 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
+      # create volume based on pvc
       volumes:
         - name: chat-app-volume
           persistentVolumeClaim:

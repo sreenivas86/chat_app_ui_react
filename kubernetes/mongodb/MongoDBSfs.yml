@@ -1,16 +1,22 @@
+# StateFulSet is a K8s Object, manages stateful applications, provides persistant storage ,stabel networking, unique and order identies for pod.
+# most time we uses for databases, cluster based application like kafka, rabbitmq etc
+
+# write service for mongo db
 apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
   namespace: chat-app-ns
 spec:
-  clusterIP: None
+  clusterIP: None # statefulset uses Domain based service discovery so clusterIp is not needed
   selector:
     app: mongodb
   ports:
     - port: 27017
       targetPort: 27017
 ---
+
+# Mongo DB stateful set
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
