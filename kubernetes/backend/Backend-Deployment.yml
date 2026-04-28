@@ -1,51 +1,46 @@
 apiVersion: apps/v1
-kind: Deployment 
+kind: Deployment
 metadata:
-  name: chat-app-backed-deploy # name of deployment
-  namespace: chat-app-ns # provide name space 
+  name: chat-app-backed-deploy
+  namespace: chat-app-ns
   labels:
-    app: chat-app-backend # label to attach service 
+    app: chat-app-backend
 
 spec:
-  
-  
-  # mention how many replicas create 
   replicas: 2
-  # selector helps to find pod and service by using labels
+
   selector:
     matchLabels:
       app: chat-app-backend
-  # Template is used to define pod configuration
-  template:  
+
+  template:
     metadata:
-      labels: 
-        app: chat-app-backend # this label matches to under selector matchLabel
-    # here we define container confs
-    spec: 
-      # this init container is checking is mongodb is running or not.
-      # if mongodb is not started, this container blocks to creation of backend app
+      labels:
+        app: chat-app-backend
+
+    spec:
       initContainers:
-        - name: mongo db busu box
+        - name: mongo-wait
           image: busybox:stable-uclibc
           command:
             - sh
             - -c
             - |
-              echo " wating for mongodb"
+              echo "waiting for mongodb"
               until nc -z mongodb 27017; do
-                echo "mongo db is not ready"
+                echo "mongodb is not ready"
                 sleep 2
               done
-              echo "mongo db is ready"
+              echo "mongodb is ready"
+
       containers:
-        - name: chat-app-backend # give a name of containers
-          image: sree471/chat-app-backend:18 
-          imagePullPolicy: Always # other types Never,IfNotPresent
+        - name: chat-app-backend
+          image: sree471/chat-app-backend:18
+          imagePullPolicy: Always
 
-          ports: 
-            - containerPort: 5000    
+          ports:
+            - containerPort: 5000
 
-          # add env variables
           env:
             - name: PORT
               valueFrom:
@@ -64,10 +59,10 @@ spec:
                 secretKeyRef:
                   name: chat-app-secret
                   key: JWT_SECRET
-          #mount a volume nfs
+
           volumeMounts:
             - name: chat-app-volume
-              mountPath: "/app/uploads/chat"
+              mountPath: /app/uploads/chat
 
           resources:
             requests:
@@ -77,7 +72,6 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
-      # create volume based on pvc
       volumes:
         - name: chat-app-volume
           persistentVolumeClaim:
