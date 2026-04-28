@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: chat-app-backend-svc
   namespace: chat-app-ns
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /health
 spec:
   selector:
     app: chat-app-backend
