@@ -74,6 +74,7 @@ jobs:
   #         chmod +x ./scripts/yq-editor.sh
   #         sh ./scripts/yq-editor.sh --file ./kubernetes/backend/Backend-Deployment.yml --image $DOCKER_BACKEND_IMAGE 
   #         sh  ./scripts/yq-editor.sh --file ./kubernetes/frontend/Frontend-deployment.yml --image $DOCKER_FRONTEND_IMAGE
+  
 
   #     - name: push to $BRANCH_NAME
   #       run: |
@@ -99,12 +100,20 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+      - name: print variables
+        run: |
+          echo $DOCKER_BACKEND_IMAGE
+          echo $DOCKER_FRONTEND_IMAGE
 
       - name: update image names
         run: |
           chmod +x ./scripts/yq-editor.sh
-          sh ./scripts/yq-editor.sh --file ./kubernetes/backend/Backend-Deployment.yml --image $DOCKER_BACKEND_IMAGE
-          sh ./scripts/yq-editor.sh --file ./kubernetes/frontend/Frontend-deployment.yml --image $DOCKER_FRONTEND_IMAGE
+          bash ./scripts/yq-editor.sh --file ./kubernetes/backend/Backend-Deployment.yml --image $DOCKER_BACKEND_IMAGE
+          bash ./scripts/yq-editor.sh --file ./kubernetes/frontend/Frontend-deployment.yml --image $DOCKER_FRONTEND_IMAGE
+      - name: printing
+        run: |
+          cat ./kubernetes/backend/Backend-Deployment.yml
+          cat ./kubernetes/frontend/Frontend-deployment.yml
 
       # ✅ FIXED LOGIN
       - name: connect to azure
@@ -142,7 +151,7 @@ jobs:
       - name: update config
         run: |
           chmod +x ./scripts/config-map-uri-chage.sh
-          sh ./scripts/config-map-uri-chage.sh --file ./kubernetes/configs/ConfigMaps.yml --uri "http://${BACKEND_IP}:5000"
+          bash ./scripts/config-map-uri-chage.sh --file ./kubernetes/configs/ConfigMaps.yml --uri "http://${BACKEND_IP}:5000"
 
       - name: deploy full k8s
         run: |

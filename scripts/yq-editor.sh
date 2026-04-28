@@ -11,7 +11,7 @@ if ! command -v yq >/dev/null 2>&1; then
     sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
 fi
-
+yq --version
 # -----------------------------
 # Read arguments
 # -----------------------------
@@ -57,9 +57,9 @@ fi
 # -----------------------------
 echo "Updating image to $IMAGE in $FILE_PATH..."
 
-yq -i '
-  select(.kind == "Deployment")
-  .spec.template.spec.containers[].image = strenv(IMAGE)
-' "$FILE_PATH"
+yq -i "
+  select(.kind == \"Deployment\")
+  .spec.template.spec.containers[].image = \"$IMAGE\"
+" "$FILE_PATH"
 
 echo " Update successfully....."
