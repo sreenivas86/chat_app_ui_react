@@ -22,6 +22,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/message', require('./routes/message'));
 app.use('/api',require('./routes/user'))
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
 
 // Socket.IO logic
 require('./socket')(io);
